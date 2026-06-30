@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hobby Bridge Chiba - バスケコミュニティ(情報の課題）</title>
+
+<!-- 明朝体 Webフォント(Noto Serif JP) -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* 基本リセット/ベース */
+:root{
+  --accent: #dc0b2c;
+  --bg: #fcfdfe;
+  --text: #222;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ヘッダー/ナビ */
+header {
+  background: #fff;
+  padding: 12px clamp(16px, 4vw, 24px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+  font-size: clamp(0.95rem, 2.6vw, 1.25rem);
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  min-width: 0;
+}
+.logo img {
+  height: clamp(40px, 9vw, 64px);
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+}
+.logo span {
+  font-size: clamp(0.85rem, 2.4vw, 1.15rem);
+  font-weight: 800;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+}
+.nav a {
+  color: #111;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  padding: 8px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.nav a:hover {
+  background: rgba(220,11,44,0.06);
+}
+.nav a.nav-cta {
+  background: var(--accent);
+  color: #fff;
+}
+.nav a.nav-cta:hover {
+  background: #b80924;
+}
+
+/* ローディング */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #111;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+.ball-container {
+  position: relative;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.basketball {
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 30% 30%, #ff1a3d, #dc0b2c);
+  border-radius: 50%;
+  border: 2px solid #000;
+  position: relative;
+  animation: bounce 0.6s infinite alternate ease-in-out;
+}
+.basketball::before,
+.basketball::after {
+  content: "";
+  position: absolute;
+  background: #000;
+}
+.basketball::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+.basketball::after {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+@keyframes bounce {
+  0% { transform: translateY(-100px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(180deg); height: 43px; }
+}
+.shadow {
+  width: 40px;
+  height: 8px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  position: absolute;
+  bottom: -10px;
+  left: calc(50% - 20px);
+  animation: shadow-scale 0.6s infinite alternate ease-in-out;
+}
+@keyframes shadow-scale {
+  0% { transform: scale(0.3); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+.loader-text {
+  margin-top: 28px;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+/* メインコンテンツ */
+#content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+#content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+section {
+  padding: clamp(40px, 8vw, 70px) clamp(14px, 4vw, 20px);
+}
+
+/* セクションタイトル */
+.section-title {
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  color: var(--accent);
+  margin-bottom: 28px;
+  text-align: center;
+  font-weight: 800;
+  position: relative;
+  display: inline-block;
+}
+.section-title::after {
+  content: "";
+  width: 60%;
+  height: 4px;
+  background: var(--accent);
+  position: absolute;
+  bottom: -12px;
+  left: 20%;
+}
+
+/* セクションボックス */
+.section-box {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  padding: clamp(20px, 5vw, 36px);
+  border-radius: 12px;
+  border-top: 5px solid var(--accent);
+  box-shadow: 0 6px 20px rgba(220,11,44,0.06);
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  line-height: 1.8;
+  color: #333;
+}
+
+/* ヒーロー(ここだけ明朝体) */
+.hero {
+  background: linear-gradient(rgba(220,11,44,0.12), rgba(252,253,254,1)),
+    url("https://drive.google.com/thumbnail?id=12KQOVlnUBY83MsaZZEd-NIAEm4Ah8-Hd&sz=w1000") no-repeat center/cover;
+  color: #111;
+  padding: clamp(40px, 9vw, 80px) clamp(16px, 4vw, 20px);
+  text-align: left;
+}
+.hero h1,
+.hero p {
+  font-family: "Noto Serif JP", serif;
+}
+.hero h1 {
+  font-size: clamp(1.7rem, 5.2vw, 3.2rem);
+  margin: 0 0 18px 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.hero p {
+  font-size: clamp(0.95rem, 2.6vw, 1.25rem);
+  margin: 0 0 28px 0;
+  color: #444;
+  font-weight: 500;
+}
+
+/* 景品ギャラリー */
+.prize-gallery { margin-top: 18px; }
+.prize-items { display: flex; gap: 12px; flex-wrap: wrap; }
+.prize {
+  width: calc(33.333% - 8px);
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+.prize img { max-width: 100%; height: auto; border-radius: 6px; }
+
+/* CTAボタン(バスケクイズ・他の活動など) */
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+.cta-row.center { justify-content: center; }
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(220,11,44,0.25);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  white-space: nowrap;
+}
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220,11,44,0.35);
+  background: #b80924;
+}
+.cta-btn.outline {
+  background: #fff;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  box-shadow: none;
+  padding: 10px 20px;
+}
+.cta-btn.outline:hover {
+  background: rgba(220,11,44,0.06);
+}
+@media (max-width: 420px) {
+  .cta-btn { width: 100%; justify-content: center; }
+}
+
+/* 他の活動カード */
+.other-activities-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #fff 0%, #fff5f6 100%);
+  padding: clamp(24px, 5vw, 36px);
+  border-radius: 12px;
+  border: 2px dashed var(--accent);
+  text-align: center;
+}
+.other-activities-card h3 {
+  margin: 0 0 10px 0;
+  color: #111;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+.other-activities-card p {
+  margin: 0 0 4px 0;
+  color: #555;
+}
+
+/* スケジュール表 */
+.bs-table-wrapper {
+  margin: 24px auto;
+  max-width: 900px;
+  border: 2px solid #e63939;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.bs-table-title {
+  font-size: 1.15rem;
+  color: #111;
+  margin-bottom: 12px;
+  padding-left: 10px;
+  border-left: 4px solid #e63939;
+  font-weight: 700;
+}
+.bs-custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  min-width: 0;
+}
+.bs-custom-table th,
+.bs-custom-table td {
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+}
+.bs-custom-table th {
+  background: #f7f9fa;
+  font-weight: 600;
+}
+.bs-time { font-weight: 700; color: #444; white-space: nowrap; }
+.bs-menu-name { font-weight: 600; color: #111; }
+
+/* SNSリンク */
+.sns-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.sns-links a {
+  display: inline-block;
+  padding: 8px 18px;
+  border: 2px solid var(--accent);
+  border-radius: 30px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.sns-links a:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* フッター */
+footer {
+  background: #111;
+  color: #999;
+  text-align: center;
+  padding: 32px 20px;
+  margin-top: 60px;
+  font-size: 0.9rem;
+  border-top: 4px solid var(--accent);
+}
+
+/* レスポンシブ */
+@media (max-width: 900px) {
+  .prize { width: calc(50% - 8px); }
+}
+@media (max-width: 480px) {
+  .prize { width: 100%; }
+}
+@media (max-width: 600px) {
+  .bs-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .bs-custom-table { min-width: 500px; }
+}
+
+</style>
+</head>
+<body>
+  <!-- ローディング -->
+  <div id="loader" aria-hidden="false">
+    <div class="ball-container" aria-hidden="true">
+      <div class="basketball" role="img" aria-label="バスケットボール"></div>
+      <div class="shadow" aria-hidden="true"></div>
+    </div>
+    <div class="loader-text">サイトを読み込み中 ...<br>もう少しで完了するよ !</div>
+  </div>
+
+  <!-- メイン -->
+  <div id="content" aria-hidden="true">
+    <header>
+      <div class="logo">
+        <img src="https://drive.google.com/thumbnail?id=1mqeecpnM-tmbcTI5BJbjhTdoOMX9TVsn&sz=w500" alt="HOBBY BRIDGE CHIBA ロゴ">
+        <span>HOBBY BRIDGE CHIBA</span>
+      </div>
+
+      <nav class="nav" aria-label="メインナビゲーション">
+        <a href="#about">理念</a>
+        <a href="#schedule">スケジュール</a>
+        <a href="activities.html">ほかの活動</a>
+        <a href="quiz.html" class="nav-cta">🏀 バスケクイズ</a>
+        <a href="contact.html">お問い合わせ</a>
+      </nav>
+    </header>
+
+    <!-- ヒーロー -->
+    <section class="hero" role="region" aria-label="ヒーロー">
+      <h1>趣味で出会い、地域で育つコミュニティ<br>「バスケ部がない」を、僕たちの手で。</h1>
+      <p>未成年が主導となって集まれる、安心できる第二の居場所を千葉市に作ります。</p>
+    </section>
+
+    <!-- 理念 -->
+    <section id="about">
+      <h2 class="section-title">私たちの理念</h2>
+      <div class="section-box">
+        「ただ遊ぶ場」ではなく、「安心して自分を出せる場所」を作りたい。<br><br>
+        学校外での自然な出会いが減り、部活動という選択肢も狭まっている今、私たちは年齢や環境の壁を越えて、趣味でつながれる新しい居場所を目指しています。<br><br>
+        大人の支援や自治体の認証による安心感をベースに持ちながらも、運営の中心は私たち未成年です。経験者が初心者に教えながら、みんなで楽しめるバスケコミュニティをここからスタートします。
+        <div class="cta-row">
+          <a class="cta-btn" href="quiz.html">🏀 バスケクイズに挑戦する</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 活動内容 -->
+    <section>
+      <h2 class="section-title">活動内容</h2>
+      <div class="section-box">
+        · 週1~2回のバスケットボール活動(初心者歓迎)<br>
+        · 経験者による基礎練習サポート<br>
+        · 自由参加のミニゲーム・交流会<br>
+        · 地域の体育館を利用した安全な活動環境<br>
+        · 景品を用意したフリースローコンテスト<br>
+
+        <div class="prize-gallery" aria-label="景品ギャラリー">
+          <h3>フリースローコンテストの景品例</h3>
+          <div class="prize-items">
+            <div class="prize">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGElWxZk33YFV7XKUDntKTtmpqZReFa1ngA-64NP6r7w&s=10" alt="お菓子の詰め合わせ">
+              <p>ミニバスケットボール</p>
+            </div>
+            <div class="prize">
+              <img src="https://altiri.bl.kuroco-img.app/v=1759588269/files/user/images/goods/25-26/basic-line-item/jacquard-towel.webp" alt="スポーツタオル">
+              <p>スポーツタオル</p>
+            </div>
+            <div class="prize">
+              <img src="https://www.starbucks.co.jp/card/businessgift/sbc/images/main/sp/mv.png" alt="ドリンクチケット">
+              <p>ドリンクチケット</p><br>
+
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top:16px;">「ガチすぎないけど、ちゃんと楽しい」そんな雰囲気を大切にしています。</p>
+      </div>
+    </section>
+
+    <!-- スケジュール -->
+    <section id="schedule">
+      <h2 class="section-title">活動スケジュール</h2>
+      <div class="bs-table-wrapper" role="region" aria-label="バスケットボール練習スケジュール">
+        <div class="bs-table-title">バスケットボール練習スケジュール</div>
+        <table class="bs-custom-table" aria-describedby="schedule-desc">
+          <caption id="schedule-desc" style="text-align:left; padding:8px 0; font-weight:600;">※スケジュールはSNSやClassi等で随時更新します</caption>
+          <thead>
+            <tr>
+              <th class="w-25">時間</th>
+              <th class="w-30">メニュー</th>
+              <th class="w-45">内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="bs-time">16:00~16:20</td>
+              <td class="bs-menu-name">ウォームアップ</td>
+              <td>ランニング・ストレッチ・軽いドリブル</td>
+            </tr>
+            <tr>
+              <td class="bs-time">16:20~16:50</td>
+              <td class="bs-menu-name">基礎ドリル</td>
+              <td>レイアップ・ジャンプシュート・パス練習</td>
+            </tr>
+            <tr>
+              <td class="bs-time">16:50~17:20</td>
+              <td class="bs-menu-name">スキル練習</td>
+              <td>1on1・2on2・ディフェンスフットワーク</td>
+            </tr>
+            <tr>
+              <td class="bs-time">17:20~18:00</td>
+              <td class="bs-menu-name">ゲーム形式(実際にやってみよう!)</td>
+              <td>5on5・セットプレー確認</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-box" style="margin-top:18px;">
+・今後の予定<br>
+	· 未定(稲毛国際中等教育学校および稲毛高校の体育館)<br>
+        · 不定期で平日活動あり<br><br>
+        ※最新スケジュールはSNSで随時更新する予定です。
+      </div>
+    </section>
+
+    <!-- 参加方法 -->
+    <section>
+      <h2 class="section-title">参加方法</h2>
+      <div class="section-box">
+        1. Googleフォーム・公式LINE・Instagramから参加希望を送信<br>
+        2. 日程と場所を確認して返信します<br>
+        3. 当日は動きやすい服装・飲み物を持って集合！<br><br>
+        初回は見学だけでもOK！
+      </div>
+    </section>
+
+    <!-- ほかの活動 -->
+    <section id="other-activities">
+      <h2 class="section-title">ほかの活動もチェック！</h2>
+      <div class="other-activities-card">
+        <h3>Hobby Bridge Chibaでは、バスケ以外の活動も準備中です</h3>
+        <p>他の活動の紹介ページはこちらから。</p>
+        <div class="cta-row center">
+          <a class="cta-btn outline" href="activities.html">ほかの活動を見る →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- お問い合わせ -->
+    <section>
+      <h2 class="section-title">お問い合わせ・SNS</h2>
+      <div class="section-box">
+        <div class="cta-row center">
+          <a class="cta-btn" href="quiz.html">🏀 バスケクイズに挑戦する</a>
+        </div>
+        <div class="sns-links" style="text-align:center; margin-top:20px;">
+          <a href="https://lin.ee/xxxxxxx" target="_blank" rel="noopener noreferrer">LINE</a>
+          <a href="https://www.instagram.com/your_account" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://x.com/your_account" target="_blank" rel="noopener noreferrer">X</a>
+        </div>
+        <p style="text-align:center; margin-top:12px;">
+          直接問い合わせる場合は <a href="contact.html">お問い合わせページ</a>へ。
+        </p>
+<p>画像使用元一覧PHOTOACさん：https://www.photo-ac.com/</p>
+<p>アルティーリ千葉さん：https://altiri.jp/goods/</p>
+<p>スターバックスさん：https://www.starbucks.co.jp/?srsltid=AfmBOooc_XdsAnF8Qt7gYTMLNH0MXCXtDt8SBtki8pO0Xx2T5qGDnJJiより引用</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Hobby Bridge Chiba. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+<script>
+window.addEventListener('load', () => {
+  const loader = document.getElementById('loader');
+  const content = document.getElementById('content');
+
+  setTimeout(() => {
+    if (loader) {
+      loader.style.opacity = '0';
+      loader.style.visibility = 'hidden';
+      loader.setAttribute('aria-hidden', 'true');
+    }
+    if (content) {
+      content.classList.add('visible');
+      content.setAttribute('aria-hidden', 'false');
+    }
+  }, 1200);
+});
+</script>
+</body>
+</html>
